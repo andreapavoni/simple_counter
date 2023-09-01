@@ -1,0 +1,23 @@
+[package]
+name = "kountr-web"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+askama = "0.12"
+axum = "0.6"
+dotenvy = "0.15"
+tokio = { version = "1.32", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.4", features = ["fs"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+entity = { path = "../entity" }
+migration = { path = "../migration" }
+service = { path = "../service" }
+uuid = { version = "1.4", features = ["serde", "v4"] }
+serde = { version = "1.0.188", features = ["derive"] }

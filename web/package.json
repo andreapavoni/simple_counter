@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format": "prettier --write --ignore-unknown ."
+    "format": "prettier --write --ignore-unknown .",
+    "css": "pnpm dlx tailwindcss -i ./frontend/app.css -o ./assets/app.css",
+    "watch": "pnpm dlx tailwindcss -i ./frontend/app.css -o ./assets/app.css --watch"
   },
   "keywords": [],
   "author": "Andrea Pavoni - andrea.pavoni@gmail.com",

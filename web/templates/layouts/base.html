@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{{ title }}{% endblock %}</title>
+  <!-- Include Tailwind CSS from a CDN -->
+  <!-- <link -->
+  <!--   href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" -->
+  <!--   rel="stylesheet" -->
+  <!-- /> -->
+
+  <link href="/assets/app.css" rel="stylesheet" />
+  <!-- Allow any inheriting page to extend head with additional assets -->
+  {% block head %}{% endblock %}
+</head>
+
+<body class="bg-gray-100 min-h-screen p-8 font-mono">
+  <div class="max-w-md mx-auto">
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-2xl font-semibold">Simple Counter Dashboard</h1>
+    </header>
+
+    <!-- Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer class="text-center mt-8">
+      <p class="text-xs font-mono">MVP Counter App - &copy; 2023</p>
+    </footer>
+  </div>
+
+</body>
+
+</html>
