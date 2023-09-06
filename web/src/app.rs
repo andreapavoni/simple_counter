@@ -1,10 +1,7 @@
 use std::{env, net::SocketAddr, str::FromStr};
 
 use anyhow::Context;
-use axum::{
-    routing::get,
-    Router,
-};
+use axum::{routing::get, Router};
 use tower_http::services::ServeDir;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -13,6 +10,11 @@ use migration::{Migrator, MigratorTrait};
 use service::sea_orm::{Database, DatabaseConnection};
 
 use crate::handlers::*;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub db: DatabaseConnection,
+}
 
 pub struct App;
 
@@ -28,8 +30,7 @@ impl App {
 
         dotenvy::dotenv().ok();
 
-        let assets_path_ref = std::env::current_dir().unwrap();
-        let assets_path = assets_path_ref.to_str().unwrap();
+        let assets_path = concat!(env!("CARGO_MANIFEST_DIR"), "/assets");
 
         let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set");
         let host = env::var("HOST").expect("HOST is not set");
@@ -38,24 +39,23 @@ impl App {
         let server_url = format!("{host}:{port}");
         let addr = SocketAddr::from_str(&server_url).unwrap();
 
-        let conn = Database::connect(db_url)
+        let db = Database::connect(db_url)
             .await
             .expect("Database connection failed");
-        Migrator::up(&conn, None).await.unwrap();
+        Migrator::up(&db, None).await.unwrap();
 
-        let state = AppState { conn };
+        let state = AppState { db };
 
         info!("initializing router...");
         let router = Router::new()
             .route("/", get(home))
             .route("/dashboard", get(dashboard))
-            .nest_service(
-                "/assets",
-                ServeDir::new(format!("{}/web/assets", assets_path)),
-            )
+            .route("/counters", get(list_counters).post(add_counter))
+            .route("/counters/new", get(new_counter))
+            .nest_service("/assets", ServeDir::new(assets_path))
             .with_state(state);
 
-        info!("router initialized, now listening on port {}", port);
+        info!("router initialized, now listening on {}", server_url);
         axum::Server::bind(&addr)
             .serve(router.into_make_service())
             .await
@@ -63,9 +63,4 @@ impl App {
 
         Ok(())
     }
-}
-
-#[derive(Clone)]
-pub struct AppState {
-    pub conn: DatabaseConnection,
 }
