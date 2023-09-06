@@ -1,10 +1,10 @@
 use std::{env, net::SocketAddr, str::FromStr};
 
 use anyhow::Context;
-use axum::{routing::get, Router};
+use axum::{routing::{get, put}, Router};
 use tower_http::services::ServeDir;
 use tracing::info;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 use kountr_app::AppState;
 
@@ -16,13 +16,14 @@ impl Web {
     pub async fn start() -> anyhow::Result<()> {
         dotenvy::dotenv().ok();
 
-        tracing_subscriber::registry()
-            .with(
-                tracing_subscriber::EnvFilter::try_from_default_env()
-                    .unwrap_or_else(|_| "kountr=debug".into()),
-            )
-            .with(tracing_subscriber::fmt::layer())
-            .init();
+        FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::new(
+            env::var("RUST_LOG").unwrap_or_else(|_| "kountr_web=debug,tower_http=debug".into()),
+        ))
+        .with_target(true)
+        .with_ansi(true)
+        .compact()
+        .init();
 
 
         let assets_path = concat!(env!("CARGO_MANIFEST_DIR"), "/assets");
@@ -40,8 +41,10 @@ impl Web {
         let router = Router::new()
             .route("/", get(home))
             .route("/dashboard", get(dashboard))
-            .route("/counters", get(list_counters).post(add_counter_handler))
+            .route("/counters", get(list_counters).post(add_counter))
             .route("/counters/new", get(new_counter))
+            .route("/counters/:id/up", put(increment_counter))
+            .route("/counters/:id/down", put(decrement_counter))
             .nest_service("/assets", ServeDir::new(assets_path))
             .with_state(state);
 

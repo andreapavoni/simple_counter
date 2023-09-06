@@ -40,9 +40,19 @@ pub struct DashboardView;
 #[derive(Template)]
 #[template(path = "views/counters/list.html")]
 pub struct ListCountersView {
-    pub counters: Vec<Counter>,
+    pub counters:  Vec<CounterView>,
 }
 
 #[derive(Template)]
 #[template(path = "views/counters/new.html")]
 pub struct NewCounterView;
+
+
+#[derive(Template)]
+#[template(path = "views/counters/item.html")]
+pub struct CounterView {
+    pub id: String,
+    pub name: String,
+    pub value: i32,
+    pub counter: Counter,
+}

@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Counter {
     pub id: String,
     pub name: String,
@@ -11,5 +12,11 @@ impl Counter {
             name,
             value,
         }
+    }
+}
+
+impl std::fmt::Display for Counter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Counter {{ id: {}, name: {}, value: {} }}", self.id, self.name, self.value)
     }
 }
