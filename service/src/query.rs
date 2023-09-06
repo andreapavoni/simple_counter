@@ -1,4 +1,4 @@
-use ::entity::{events, events::Entity as Event};
+use ::entity::{events, events::Entity as Event, counters, counters::Entity as Counter};
 use sea_orm::*;
 
 pub struct Query;
@@ -22,6 +22,13 @@ impl Query {
     pub async fn list_all_events(db: &DbConn) -> Result<Vec<events::Model>, DbErr> {
         Event::find()
             .order_by_desc(events::Column::Timestamp)
+            .all(db)
+            .await
+    }
+
+
+    pub async fn list_all_counters(db: &DbConn) -> Result<Vec<counters::Model>, DbErr> {
+        Counter::find()
             .all(db)
             .await
     }
