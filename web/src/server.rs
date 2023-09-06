@@ -6,20 +6,16 @@ use tower_http::services::ServeDir;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use migration::{Migrator, MigratorTrait};
-use service::sea_orm::{Database, DatabaseConnection};
+use kountr_app::AppState;
 
 use crate::handlers::*;
 
-#[derive(Clone)]
-pub struct AppState {
-    pub db: DatabaseConnection,
-}
+pub struct Web;
 
-pub struct App;
-
-impl App {
+impl Web {
     pub async fn start() -> anyhow::Result<()> {
+        dotenvy::dotenv().ok();
+
         tracing_subscriber::registry()
             .with(
                 tracing_subscriber::EnvFilter::try_from_default_env()
@@ -28,7 +24,6 @@ impl App {
             .with(tracing_subscriber::fmt::layer())
             .init();
 
-        dotenvy::dotenv().ok();
 
         let assets_path = concat!(env!("CARGO_MANIFEST_DIR"), "/assets");
 
@@ -39,27 +34,22 @@ impl App {
         let server_url = format!("{host}:{port}");
         let addr = SocketAddr::from_str(&server_url).unwrap();
 
-        let db = Database::connect(db_url)
-            .await
-            .expect("Database connection failed");
-        Migrator::up(&db, None).await.unwrap();
+        let state = AppState::new(db_url).await;
 
-        let state = AppState { db };
-
-        info!("initializing router...");
+        info!("Initializing router...");
         let router = Router::new()
             .route("/", get(home))
             .route("/dashboard", get(dashboard))
-            .route("/counters", get(list_counters).post(add_counter))
+            .route("/counters", get(list_counters).post(add_counter_handler))
             .route("/counters/new", get(new_counter))
             .nest_service("/assets", ServeDir::new(assets_path))
             .with_state(state);
 
-        info!("router initialized, now listening on {}", server_url);
+        info!("Router initialized, now listening on {}", server_url);
         axum::Server::bind(&addr)
             .serve(router.into_make_service())
             .await
-            .context("error while starting server")?;
+            .context("Error while starting server")?;
 
         Ok(())
     }

@@ -1,4 +1,9 @@
-# Running Migrator CLI
+# Kountr DB
+
+Contains CLI and libraries to interact with database and schemas in Kountr.
+
+
+## Running Migrator CLI
 
 - Generate a new migration file
     ```sh

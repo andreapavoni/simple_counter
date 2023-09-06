@@ -1,7 +1,7 @@
-use kountr_web::App;
+use kountr_web::Web;
 
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    App::start().await
+    Web::start().await
 }

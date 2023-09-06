@@ -4,18 +4,15 @@ use axum::{
     response::IntoResponse,
 };
 
-use entity::counters;
+use kountr_app::domain::models::Counter;
+use kountr_app::{AppState, add_counter, list_all_counters};
 use serde::{Deserialize, Serialize};
-use service::{Mutation as MutationService, Query as QueryService};
 
 use crate::views::*;
-use crate::AppState;
 
 // Home
-pub async fn home(state: State<AppState>) -> impl IntoResponse {
-    let events = QueryService::list_all_events(&state.db).await.unwrap();
-
-    HtmlView(HomeView { events })
+pub async fn home(_state: State<AppState>) -> impl IntoResponse {
+    HtmlView(HomeView {})
 }
 
 // Dashboard
@@ -25,7 +22,7 @@ pub async fn dashboard() -> impl IntoResponse {
 
 // Counters
 pub async fn list_counters(state: State<AppState>) -> impl IntoResponse {
-    let counters = QueryService::list_all_counters(&state.db).await.unwrap();
+    let counters = list_all_counters(&state.db).await.unwrap();
 
     HtmlView(ListCountersView { counters })
 }
@@ -35,33 +32,29 @@ pub async fn new_counter() -> impl IntoResponse {
 }
 
 // Add Counter
-//
+
 #[derive(Serialize, Deserialize)]
 pub struct NewCounterParams {
     name: String,
     value: i32,
 }
 
-impl Into<counters::Model> for NewCounterParams {
-    fn into(self) -> counters::Model {
-        counters::Model {
-            name: self.name,
-            value: self.value,
-            ..Default::default()
-        }
+impl Into<Counter> for NewCounterParams {
+    fn into(self) -> Counter {
+        Counter::new(self.name, self.value)
     }
 }
 
-pub async fn add_counter(
+pub async fn add_counter_handler(
     state: State<AppState>,
     Form(form): Form<NewCounterParams>,
 ) -> impl IntoResponse {
     let mut header = HeaderMap::new();
     header.insert(header::LOCATION, HeaderValue::from_static("/counters"));
 
-    MutationService::add_counter(&state.db, form.into())
+    add_counter(&state.db, form.into())
         .await
-        .expect("Cannot create post");
+        .expect("Cannot create counter");
 
     (StatusCode::SEE_OTHER, header)
     // HtmlView(ListCountersView {})

@@ -16,8 +16,6 @@ tower = "0.4"
 tower-http = { version = "0.4", features = ["fs"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-entity = { path = "../entity" }
-migration = { path = "../migration" }
-service = { path = "../service" }
+kountr-app = { path = "../app" }
 uuid = { version = "1.4", features = ["serde", "v4"] }
-serde = { version = "1.0.188", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }

@@ -1,5 +1,5 @@
-mod app;
+mod server;
 mod handlers;
 mod views;
 
-pub use app::*;
+pub use server::*;

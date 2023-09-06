@@ -3,8 +3,7 @@ use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
 };
-
-use entity::{events, counters};
+use kountr_app::domain::models::Counter;
 
 pub struct HtmlView<T>(pub T);
 
@@ -31,7 +30,6 @@ where
 #[derive(Template)]
 #[template(path = "views/pages/home.html")]
 pub struct HomeView {
-    pub events: Vec<events::Model>,
 }
 
 #[derive(Template)]
@@ -42,7 +40,7 @@ pub struct DashboardView;
 #[derive(Template)]
 #[template(path = "views/counters/list.html")]
 pub struct ListCountersView {
-    pub counters: Vec<counters::Model>,
+    pub counters: Vec<Counter>,
 }
 
 #[derive(Template)]
