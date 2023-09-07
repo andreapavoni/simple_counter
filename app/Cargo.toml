@@ -16,3 +16,4 @@ uuid = { version = "1.4", features = ["serde", "v4"] }
 kountr-db = { path = "../db" }
 sea-orm = { version = "0.12", features = ["runtime-tokio-rustls", "sqlx-sqlite"]} 
 tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

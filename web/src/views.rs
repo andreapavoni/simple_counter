@@ -28,28 +28,34 @@ where
 }
 
 #[derive(Template)]
-#[template(path = "views/pages/home.html")]
-pub struct HomeView {
-}
+#[template(path = "pages/home.html")]
+pub struct HomeView {}
 
 #[derive(Template)]
-#[template(path = "views/pages/dashboard.html")]
+#[template(path = "pages/dashboard.html")]
 pub struct DashboardView;
 
 // Counters
 #[derive(Template)]
-#[template(path = "views/counters/list.html")]
+#[template(path = "counters/list.html")]
 pub struct ListCountersView {
-    pub counters:  Vec<CounterView>,
+    pub counters: Vec<CounterView>,
 }
 
 #[derive(Template)]
-#[template(path = "views/counters/new.html")]
+#[template(path = "counters/new.html")]
 pub struct NewCounterView;
 
+#[derive(Template)]
+#[template(path = "counters/edit.html")]
+pub struct EditCounterView {
+    pub id: String,
+    pub name: String,
+    pub value: i32,
+}
 
 #[derive(Template)]
-#[template(path = "views/counters/item.html")]
+#[template(path = "counters/item.html")]
 pub struct CounterView {
     pub id: String,
     pub name: String,

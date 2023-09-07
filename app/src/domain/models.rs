@@ -13,6 +13,14 @@ impl Counter {
             value,
         }
     }
+
+    pub fn new_with_id(id: String, name: String, value: i32) -> Self {
+        Self {
+            id,
+            name,
+            value,
+        }
+    }
 }
 
 impl std::fmt::Display for Counter {

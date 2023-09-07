@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write --ignore-unknown .",
-    "css": "pnpm dlx tailwindcss -i ./frontend/app.css -o ./assets/app.css",
-    "watch": "pnpm dlx tailwindcss -i ./frontend/app.css -o ./assets/app.css --watch"
+    "css": "pnpm dlx tailwindcss -i ./static/app.css -o ./assets/app.css",
+    "watch": "pnpm dlx tailwindcss -i ./static/app.css -o ./assets/app.css --watch",
+    "release": "pnpm dlx tailwindcss -i ./static/app.css -o ./assets/app.css --minify"
   },
   "keywords": [],
   "author": "Andrea Pavoni - andrea.pavoni@gmail.com",

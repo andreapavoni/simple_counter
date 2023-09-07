@@ -33,6 +33,14 @@ pub async fn list_counters(db: &DbConn) -> Result<Vec<counters::Model>, DbError>
     Ok(counters)
 }
 
+pub async fn find_counter_by_id(db: &DbConn, id: String) -> Result<counters::Model, DbError> {
+    if let Some(counter) = counters::Entity::find_by_id(id).one(db).await? {
+        return Ok(counter);
+    }
+
+    Err(DbError::NotFound)
+}
+
 pub async fn update_counter_value(
     db: &DbConn,
     id: String,
@@ -48,6 +56,35 @@ pub async fn update_counter_value(
         counter.value = new_value;
 
         return Ok(counter);
+    }
+
+    Err(DbError::NotFound)
+}
+
+pub async fn update_counter(
+    db: &DbConn,
+    counter: counters::Model,
+) -> Result<counters::Model, DbError> {
+    let mut db_counter = find_counter_by_id(db, counter.clone().id).await?;
+
+    let mut model: counters::ActiveModel = db_counter.clone().into();
+    model.name = Set(counter.name.to_owned());
+    model.value = Set(counter.value.to_owned());
+
+    db_counter.name = counter.name;
+    db_counter.value = counter.value;
+
+    model.save(db).await?;
+
+    Ok(db_counter)
+}
+
+pub async fn delete_counter(db: &DbConn, id: String) -> Result<(), DbError> {
+    if let Some(counter) = counters::Entity::find_by_id(id).one(db).await? {
+        let model: counters::ActiveModel = counter.clone().into();
+        model.delete(db).await?;
+
+        return Ok(());
     }
 
     Err(DbError::NotFound)

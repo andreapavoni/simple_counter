@@ -2,7 +2,9 @@ pub mod domain;
 mod shims;
 
 use std::env;
+use tracing::metadata::LevelFilter;
 use tracing::Level as LogLevel;
+use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
 use domain::models;
 use kountr_db::{error::DbError, repository, Database, DbConn};
@@ -13,15 +15,7 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub async fn new(db_url: &str) -> Self {
-        let db = Database::connect(db_url)
-            .await
-            .expect("Database connection failed");
-
-        repository::run_migrations(&db)
-            .await
-            .expect("Database migrations failed");
-
+    pub fn new(db: DbConn) -> AppState {
         AppState { db }
     }
 }
@@ -61,6 +55,40 @@ impl AppOptions {
     }
 }
 
+pub async fn init_app(opts: &AppOptions) -> AppState {
+    init_app_tracing(&opts);
+
+    let db = Database::connect(&opts.db_url)
+        .await
+        .expect("Database connection failed");
+
+    repository::run_migrations(&db)
+        .await
+        .expect("Database migrations failed");
+
+    AppState::new(db.clone())
+}
+
+fn init_app_tracing(opts: &AppOptions) {
+    let debug_filter = match opts.env {
+        AppEnv::Prod => LevelFilter::OFF,
+        _ => LevelFilter::DEBUG,
+    };
+
+    let tracing_filter = filter::Targets::new()
+        .with_target("tower_http::trace::on_response", opts.log_level)
+        .with_target("sea_orm_migration::migrator", debug_filter)
+        .with_target("sqlx::query", debug_filter)
+        .with_default(opts.log_level);
+
+    let tracing_layer = tracing_subscriber::fmt::layer().compact();
+
+    tracing_subscriber::registry()
+        .with(tracing_layer)
+        .with(tracing_filter)
+        .init();
+}
+
 pub async fn add_counter(db: &DbConn, data: models::Counter) -> Result<models::Counter, DbError> {
     let new_counter = repository::insert_counter(db, data.into()).await?;
 
@@ -71,6 +99,24 @@ pub async fn list_all_counters(db: &DbConn) -> Result<Vec<models::Counter>, DbEr
     let counters = repository::list_counters(db).await?;
 
     Ok(counters.into_iter().map(Into::into).collect())
+}
+
+
+pub async fn find_counter(db: &DbConn, id: String) -> Result<models::Counter, DbError> {
+    let counter = repository::find_counter_by_id(db, id).await?;
+    Ok(counter.into())
+}
+
+
+pub async fn update_counter(db: &DbConn, counter: models::Counter) -> Result<models::Counter, DbError> {
+    let counter = repository::update_counter(db, counter.into()).await?;
+    Ok(counter.into())
+}
+
+
+pub async fn delete_counter(db: &DbConn, id: String) -> Result<(), DbError> {
+    let _ = repository::delete_counter(db, id).await?;
+    Ok(())
 }
 
 pub async fn increment_counter(db: &DbConn, id: String) -> Result<models::Counter, DbError> {
