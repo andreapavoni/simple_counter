@@ -3,4 +3,4 @@
 /node_modules
 Cargo.lock
 package-lock.json
-data/*.db
+_data/*.db

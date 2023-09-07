@@ -1,8 +1,11 @@
 pub mod domain;
 mod shims;
 
+use std::env;
+use tracing::Level as LogLevel;
+
 use domain::models;
-use kountr_db::{repository, Database, DbConn, error::DbError};
+use kountr_db::{error::DbError, repository, Database, DbConn};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -10,7 +13,7 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub async fn new(db_url: String) -> Self {
+    pub async fn new(db_url: &str) -> Self {
         let db = Database::connect(db_url)
             .await
             .expect("Database connection failed");
@@ -20,6 +23,41 @@ impl AppState {
             .expect("Database migrations failed");
 
         AppState { db }
+    }
+}
+
+pub enum AppEnv {
+    Dev,
+    Prod,
+}
+
+pub struct AppOptions {
+    pub db_url: String,
+    pub host: String,
+    pub port: u16,
+    pub env: AppEnv,
+    pub log_level: LogLevel,
+}
+
+impl AppOptions {
+    pub fn new_from_envs() -> Self {
+        let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set");
+        let host = env::var("HOST").unwrap_or("127.0.0.1".to_string());
+        let port = env::var("PORT").unwrap_or("8000".to_string());
+        let env_level = env::var("APP_ENV").unwrap_or("dev".to_string());
+
+        let (app_env, log_level) = match env_level.as_str() {
+            "prod" => (AppEnv::Prod, LogLevel::INFO),
+            _ => (AppEnv::Dev, LogLevel::DEBUG),
+        };
+
+        Self {
+            db_url,
+            host,
+            port: port.parse().unwrap(),
+            env: app_env,
+            log_level,
+        }
     }
 }
 
