@@ -46,14 +46,17 @@ pub async fn update_counter_value(
     id: String,
     value: i32,
 ) -> Result<counters::Model, DbError> {
-    if let Some(mut counter) = counters::Entity::find_by_id(id).one(db).await? {
+    let txn = db.begin().await?;
+    if let Some(mut counter) = counters::Entity::find_by_id(id).one(&txn).await? {
         let new_value = counter.clone().value + value;
 
         let mut model: counters::ActiveModel = counter.clone().into();
         model.value = sea_orm::Set(new_value);
-        model.update(db).await?;
+        model.update(&txn).await?;
 
         counter.value = new_value;
+
+        txn.commit().await?;
 
         return Ok(counter);
     }
@@ -65,7 +68,15 @@ pub async fn update_counter(
     db: &DbConn,
     counter: counters::Model,
 ) -> Result<counters::Model, DbError> {
-    let mut db_counter = find_counter_by_id(db, counter.clone().id).await?;
+    let txn = db.begin().await?;
+
+    let db_counter = counters::Entity::find_by_id(counter.clone().id)
+        .one(&txn)
+        .await?;
+    if db_counter.is_none() {
+        return Err(DbError::NotFound);
+    }
+    let mut db_counter = db_counter.unwrap();
 
     let mut model: counters::ActiveModel = db_counter.clone().into();
     model.name = Set(counter.name.to_owned());
@@ -74,18 +85,23 @@ pub async fn update_counter(
     db_counter.name = counter.name;
     db_counter.value = counter.value;
 
-    model.save(db).await?;
+    model.save(&txn).await?;
 
+    txn.commit().await?;
     Ok(db_counter)
 }
 
 pub async fn delete_counter(db: &DbConn, id: String) -> Result<(), DbError> {
-    if let Some(counter) = counters::Entity::find_by_id(id).one(db).await? {
-        let model: counters::ActiveModel = counter.clone().into();
-        model.delete(db).await?;
+    let txn = db.begin().await?;
 
+    if let Some(counter) = counters::Entity::find_by_id(id).one(&txn).await? {
+        let model: counters::ActiveModel = counter.clone().into();
+        model.delete(&txn).await?;
+
+        txn.commit().await?;
         return Ok(());
     }
 
+    txn.rollback().await?;
     Err(DbError::NotFound)
 }
