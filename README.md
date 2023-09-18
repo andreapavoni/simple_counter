@@ -1,4 +1,4 @@
-# Simple Counter
+# Simple Counter
 
 Simple very app to manage counters.
 
