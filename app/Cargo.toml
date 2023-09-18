@@ -19,4 +19,4 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 async-trait = "0.1"
 serde = { version = "1.0", features = ["derive"] }
-mini_cqrs = {path = "../../../mini_cqrs"}
+mini_cqrs = { git = "https://github.com/andreapavoni/mini_cqrs.git" }

@@ -21,4 +21,4 @@ sea-orm = { version = "0.12", features = ["default", "runtime-tokio-rustls", "sq
 sea-query = "0.30"
 chrono = {version = "0.4.30", features = ["serde"]}
 async-trait = "0.1"
-mini_cqrs = {path = "../../../mini_cqrs"}
+mini_cqrs = { git = "https://github.com/andreapavoni/mini_cqrs.git" }
