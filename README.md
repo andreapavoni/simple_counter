@@ -18,7 +18,7 @@ It is clearly overkill for a simple application like this, indeed I'm using it f
 * run: `APP_ENV=prod cargo run --release`
 * open: `http://localhost:8000/counters`
 
-## Status
+## Status
 
 **Work In Progress**
 
