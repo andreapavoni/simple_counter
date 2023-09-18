@@ -52,7 +52,7 @@ pub async fn dashboard() -> impl IntoResponse {
 }
 
 pub async fn list_counters(state: State<AppState>) -> impl IntoResponse {
-    let counters = kountr_app::list_all_counters(&state.db).await.unwrap();
+    let counters = kountr_app::list_all_counters(&state).await.unwrap();
 
     HtmlView(ListCountersView {
         counters: counters
@@ -72,10 +72,10 @@ pub async fn new_counter() -> impl IntoResponse {
 }
 
 pub async fn add_counter(
-    state: State<AppState>,
+    mut state: State<AppState>,
     Form(form): Form<NewCounterParams>,
 ) -> impl IntoResponse {
-    kountr_app::add_counter(&state.db, form.into())
+    kountr_app::add_counter(&mut state, form.into())
         .await
         .expect("Cannot create counter");
 
@@ -83,7 +83,7 @@ pub async fn add_counter(
 }
 
 pub async fn edit_counter(Path(id): Path<String>, state: State<AppState>) -> impl IntoResponse {
-    let counter = kountr_app::find_counter(&state.db, id)
+    let counter = kountr_app::find_counter(&state, id)
         .await
         .expect("Cannot find counter");
 
@@ -98,7 +98,7 @@ pub async fn update_counter(
     state: State<AppState>,
     Form(form): Form<UpdateCounterParams>,
 ) -> impl IntoResponse {
-    kountr_app::update_counter(&state.db, form.into())
+    kountr_app::update_counter(&state, form.into())
         .await
         .expect("Cannot update counter");
 
@@ -110,7 +110,7 @@ pub async fn update_counter(
 }
 
 pub async fn delete_counter(Path(id): Path<String>, state: State<AppState>) -> impl IntoResponse {
-    kountr_app::delete_counter(&state.db, id)
+    kountr_app::delete_counter(&state, id)
         .await
         .expect("Cannot delete counter");
 
@@ -125,7 +125,7 @@ pub async fn increment_counter(
     Path(id): Path<String>,
     state: State<AppState>,
 ) -> impl IntoResponse {
-    let counter = kountr_app::increment_counter(&state.db, id)
+    let counter = kountr_app::increment_counter(&state, id)
         .await
         .expect("Cannot increment counter");
 
@@ -141,7 +141,7 @@ pub async fn decrement_counter(
     state: State<AppState>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let counter = kountr_app::decrement_counter(&state.db, id)
+    let counter = kountr_app::decrement_counter(&state, id)
         .await
         .expect("Cannot increment counter");
 

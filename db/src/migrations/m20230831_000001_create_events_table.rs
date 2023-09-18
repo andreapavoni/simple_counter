@@ -14,12 +14,11 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Events::Id).uuid().not_null().primary_key())
                     .col(ColumnDef::new(Events::Name).string().not_null())
                     .col(
-                        ColumnDef::new(Events::Value)
-                            .integer()
-                            .default(0)
+                        ColumnDef::new(Events::Payload)
+                            .json()
                             .not_null(),
                     )
-                    .col(ColumnDef::new(Events::CounterId).uuid().not_null())
+                    .col(ColumnDef::new(Events::AggregateId).uuid().not_null())
                     .col(
                         ColumnDef::new(Events::Timestamp)
                             .timestamp_with_time_zone()
@@ -32,22 +31,25 @@ impl MigrationTrait for Migration {
         manager
             .create_index(
                 Index::create()
-                    .name("idx_events_counter_id")
+                    .name("idx_events_aggregate_id")
                     .table(Events::Table)
-                    .col(Events::CounterId)
+                    .col(Events::AggregateId)
+                    .to_owned(),
+            )
+            .await?;
+
+
+        manager
+            .create_index(
+                Index::create()
+                    .name("idx_events_name")
+                    .table(Events::Table)
+                    .col(Events::Name)
                     .to_owned(),
             )
             .await
-    }
 
-    // CREATE TABLE IF NOT EXISTS "events" (
-    //     "id" text(36) NOT NULL PRIMARY KEY,
-    //     "name" text NOT NULL,
-    //     "value" integer DEFAULT 0 NOT NULL,
-    //     "counter_id" text(36) NOT NULL,
-    //     "timestamp" text NOT NULL,
-    //     CONSTRAINT "idx_events_counter_id" ("counter_id")
-    // )
+    }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
@@ -61,7 +63,7 @@ enum Events {
     Table,
     Id,
     Name,
-    Value,
-    CounterId,
+    Payload,
+    AggregateId,
     Timestamp,
 }

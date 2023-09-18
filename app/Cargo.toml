@@ -17,3 +17,6 @@ kountr-db = { path = "../db" }
 sea-orm = { version = "0.12", features = ["runtime-tokio-rustls", "sqlx-sqlite"]} 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+async-trait = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+mini_cqrs = {path = "../../../mini_cqrs"}

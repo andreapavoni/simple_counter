@@ -7,6 +7,8 @@ pub enum DbError {
     #[error(transparent)]
     Db(#[from] sea_orm::DbErr),
     NotFound,
+    #[error(transparent)]
+    Cqrs(#[from] mini_cqrs::CqrsError),
 }
 
 impl Display for DbError {
