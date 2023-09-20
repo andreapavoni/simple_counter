@@ -11,7 +11,7 @@ It is clearly overkill for a simple application like this, indeed I'm using it f
 
 ## Usage
 
-* clone this repo: `git clone https://github.com/andreapavoni/kountr.git`
+* clone this repo: `git clone https://github.com/andreapavoni/simple_counter.git`
 * create a SQLite database file (using `touch db.sqlite3` works as well)
 * copy `.env.example` to `.env` and edit it accordingly
 * compile assets: `cd web/ && pnpm release`

@@ -4,19 +4,19 @@
 <form hx-put="/counters/{{ id }}" class="mt-4" hx-trigger="submit">
   <input type="hidden" id="id" name="id" value="{{ id }}">
   <div class="mb-4">
-    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+    <label for="name" class="block text-sm font-bold text-gray-700">Name</label>
     <input type="text" id="name" name="name" value="{{ name }}" placeholder="Enter a name for the counter" class="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
   </div>
 
   <div class="mb-4">
-    <label for="value" class="block text-sm font-medium text-gray-700">Value</label>
+    <label for="value" class="block text-sm font-bold text-gray-700">Value</label>
     <input type="number" id="value" value="{{ value }}" name="value" placeholder="Initial value (optional)" class="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
   </div>
 
   <div class="flex justify-between">
-    <a href="/counters" class="px-4 py-2 bg-gray-300 rounded-full text-gray-700 hover:bg-gray-400">Cancel</a>
-    <a href="/counters" hx-delete="/counters/{{ id }}" hx-confirm="Are you sure?" class="px-4 py-2 bg-red-700 rounded-full text-white hover:bg-red-400">Delete</a>
-    <button type="submit" hx-trigger="submit" class="px-4 py-2 bg-blue-500 rounded-full text-white hover:bg-blue-600">Update Counter</button>
+    <a href="/counters" class="px-4 py-2 bg-gray-300 rounded text-gray-700 hover:bg-gray-400">Cancel</a>
+    <a href="/counters" hx-delete="/counters/{{ id }}" hx-confirm="Are you sure?" class="px-4 py-2 bg-red-600 rounded text-white hover:bg-red-500">Delete</a>
+    <button type="submit" hx-trigger="submit" class="px-4 py-2 bg-indigo-600 rounded text-white hover:bg-indigo-500">Update Counter</button>
   </div>
 </form>
 {% endblock %}

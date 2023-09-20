@@ -55,7 +55,7 @@ impl EventConsumer for CounterEventConsumer {
                     .find_counter_by_id(aggregate_id.clone())
                     .await
                     .unwrap();
-                counter.value -= amount;
+                counter.value += amount;
                 _ = self.counter_model.update(counter.into()).await;
             }
             CounterEvent::CounterUpdated {

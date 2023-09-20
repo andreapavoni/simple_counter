@@ -1,8 +1,22 @@
 <!-- prettier-ignore -->
 {% extends "base.html" %}
 
-{% block title %}Home Page{% endblock %}
+{% block title %}Simple Counter{% endblock %}
 
 {% block content %}
-  <h1 class="font-bold text-indigo-500">Hello, Kountr here.</h1>
+  <h2 class="text-indigo-500 font-bold mb-5">A very simple app to manage... <i>counters</i>.</h2>
+
+  <p class="text-gray-500 leading-relaxed my-5">
+    An experiment with fancy tech stuff. Rust and CQRS/ES in particular. This is a simple domain to play with. After all, it's full of counters to experiment with frontend frameworks, let's do something on the backend side.
+  </p>
+
+  <p class="text-gray-500 leading-relaxed mb-5">
+  I wanted to scratch this itch since a lot of time. The main use case is to track <i>occurrencies</i> in the everyday life, so that you don't have to rely on <i>perception</i>.
+  </p>
+
+  <p class="text-gray-500 leading-relaxed my-5">
+    That's the whole point. Counting things.
+  </p>
+
+  <a class="place-self-center px-4 py-2 font-bold rounded text-white bg-indigo-600 hover:border-indigo-200 hover:bg-indigo-500" href="/counters">Go to counters</a>
 {% endblock %}
